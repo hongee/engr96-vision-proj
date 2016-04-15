@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "gcloud": "^0.30.3",
+    "lodash": "^4.11.1",
     "request": "^2.71.0"
   }
 }
