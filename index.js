@@ -14,7 +14,7 @@ var gvision = gcloud.vision({
     keyFilename: './key.json'
 });
 
-function uploadImageToGcloud() {
+function uploadImageToGcloud(res) {
   fs.readFile("test003.jpg", function(err, data) {
       var imgb64 = data.toString('base64');
       var annotateImageReq = {
@@ -32,11 +32,14 @@ function uploadImageToGcloud() {
 
       gvision.annotate(annotateImageReq, function(err, annotations, apiResponse) {
         console.log("Done!\n");
+        res.json(annotations);
+        /*
         _.forEach(annotations[0] ,function(val) {
           _.forEach(val, function(v) {
             console.log(v.description);
           })
         });
+        */
       });
   });
 }
@@ -71,7 +74,7 @@ app.get('/api/snap', function(req,res) {
 });
 
 app.get('/api/identify', function(req,res) {
-  uploadImageToGcloud();
+  uploadImageToGcloud(res);
 });
 
 http.listen(3000, function() {
