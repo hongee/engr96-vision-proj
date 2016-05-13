@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>engr-96-vision-proj webui</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.css" rel="stylesheet" />
+    <style>
+      .output {
+        margin-top: 1em;
+      }
+      .controls {
+        margin-top: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row output">
+        <div class="col-md-6">
+          <img id="img-field" src="http://www.placekitten.com/640/480"/>
+        </div>
+        <div class="col-md-6">
+          <pre>
+            Response text will be dumped here
+          </pre>
+        </div>
+      </div>
+      <div class="row controls">
+        <div class="col-md-12">
+          <button class="btn btn-lg" id="snapbtn">Snap</button>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+    <script>
+      var $snapbtn = $("#snapbtn");
+
+      $snapbtn.click(function(){
+        $.getJSON("/api/snap", function(data) {
+          console.log(data);
+        });
+      });
+
+    </script>
+  </body>
+</html>
