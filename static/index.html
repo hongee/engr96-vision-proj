@@ -45,8 +45,8 @@
       $snapbtn.click(function(){
         $output.append("\n");
         $.getJSON("/api/snap", function(data) {
-          $output.append(data);
-          $img.attr("src",data.img);
+          $output.append(data.stringify());
+          $img.attr("src","data:image/jpeg;charset=utf-8;base64," + data.img);
         });
       });
 

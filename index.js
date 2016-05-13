@@ -51,9 +51,11 @@ function snap(res) {
       console.log("bad img");
       snap(res);
     } else {
-      console.log("good img");
-      res.json({
-        img: "test003.jpg"
+      fs.readFile("test003.jpg", function(err, data) {
+          var imgb64 = data.toString('base64');
+          res.json({
+            img: imgb64
+          });
       });
     }
 
@@ -62,11 +64,6 @@ function snap(res) {
 
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/app/index.html');
-});
-
-//im lazy
-app.get('/test003.jpg', function(req,res) {
-  res.sendFile(__dirname + '/test003.jpg');
 });
 
 app.get('/api/snap', function(req,res) {
