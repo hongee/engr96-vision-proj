@@ -53,9 +53,9 @@
 
       $procbtn.click(function(){
         $output.append("\n");
-        $.getJSON("/api/snap", function(data) {
+        $.getJSON("/api/identify", function(data) {
           console.log(data);
-          $output.append(data.stringify());
+          $output.append(JSON.stringify(data));
         });
       });
 
