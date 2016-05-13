@@ -3,13 +3,16 @@
   <head>
     <meta charset="utf-8">
     <title>engr-96-vision-proj webui</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <style>
       .output {
         margin-top: 1em;
       }
       .controls {
         margin-top: 1em;
+      }
+      #img-field {
+        max-width: 100%; height: auto;
       }
     </style>
   </head>
@@ -20,26 +23,35 @@
           <img id="img-field" src="http://www.placekitten.com/640/480"/>
         </div>
         <div class="col-md-6">
-          <pre>
-            Response text will be dumped here
+          <pre id="output-dump">----- OUTPUT ------
           </pre>
         </div>
       </div>
       <div class="row controls">
         <div class="col-md-12">
           <button class="btn btn-lg" id="snapbtn">Snap</button>
+          <button class="btn btn-lg" id="processbtn">Process</button>
+          <button class="btn btn-lg" id="clearbtn">Clear</button>
         </div>
       </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script>
       var $snapbtn = $("#snapbtn");
-
+      var $clearbtn = $("#clearbtn");
+      var $output = $("#output-dump");
+      var $img = $("#img-field");
       $snapbtn.click(function(){
+        $output.append("\n");
         $.getJSON("/api/snap", function(data) {
-          console.log(data);
+          $output.append(data);
+          $img.attr("src",data.img);
         });
+      });
+
+      $clearbtn.click(function(){
+        $output.html("");
       });
 
     </script>

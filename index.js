@@ -42,6 +42,7 @@ function uploadImageToGcloud() {
 }
 
 function snap(res) {
+  console.log("Snapping Pic...");
   exec("/home/root/bin/ffmpeg/ffmpeg -s 640x480 -f video4linux2 -i /dev/video0 -vframes 3 test%3d.jpg" , function(error, stdout, stderr) {
     //get file information for taken image
     var stats = fs.statSync("test003.jpg");
@@ -51,11 +52,8 @@ function snap(res) {
       snap(res);
     } else {
       console.log("good img");
-      fs.readFile("test003.jpg", function(err, data) {
-          var imgb64 = data.toString('base64');
-          res.json({
-            img: imgb64,
-          });
+      res.json({
+        img: "test003.jpg"
       });
     }
 
