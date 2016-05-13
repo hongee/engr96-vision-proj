@@ -39,6 +39,7 @@
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script>
       var $snapbtn = $("#snapbtn");
+      var $procbtn = $("#processbtn");
       var $clearbtn = $("#clearbtn");
       var $output = $("#output-dump");
       var $img = $("#img-field");
@@ -47,6 +48,14 @@
         $.getJSON("/api/snap", function(data) {
           $output.append(data.stringify());
           $img.attr("src","data:image/jpeg;charset=utf-8;base64," + data.img);
+        });
+      });
+
+      $procbtn.click(function(){
+        $output.append("\n");
+        $.getJSON("/api/snap", function(data) {
+          console.log(data);
+          $output.append(data.stringify());
         });
       });
 
