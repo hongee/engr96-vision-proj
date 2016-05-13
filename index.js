@@ -64,6 +64,11 @@ app.get('/', function(req, res) {
   res.sendFile(__dirname + '/app/index.html');
 });
 
+//im lazy
+app.get('/test003.jpg', function(req,res) {
+  res.sendFile(__dirname + '/test003.jpg');
+});
+
 app.get('/api/snap', function(req,res) {
   snap(res);
 });
