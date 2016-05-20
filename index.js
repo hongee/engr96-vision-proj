@@ -18,7 +18,7 @@ var isIdentifying = false;
 var isSnapping = false;
 
 function uploadImageToGcloud(res) {
-  fs.readFile("test003.jpg", function(err, data) {
+  fs.readFile("test002.jpg", function(err, data) {
       var imgb64 = data.toString('base64');
       var annotateImageReq = {
           "image": {
@@ -67,7 +67,7 @@ function snap(res) {
       console.log("bad img");
       snap(res);
     } else {
-      fs.readFile("test003.jpg", function(err, data) {
+      fs.readFile("test002.jpg", function(err, data) {
           var imgb64 = data.toString('base64');
           res.json({
             img: imgb64
