@@ -55,7 +55,7 @@
         $output.append("\n");
         $.getJSON("/api/identify", function(data) {
           console.log(data);
-          $output.append(JSON.stringify(data));
+          $output.append(data.stringify());
         });
       });
 
