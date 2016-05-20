@@ -14,8 +14,8 @@ var gvision = gcloud.vision({
     keyFilename: './key.json'
 });
 
-var isIdentifying = true;
-var isSnapping = true;
+var isIdentifying = false;
+var isSnapping = false;
 
 function uploadImageToGcloud(res) {
   fs.readFile("test003.jpg", function(err, data) {
