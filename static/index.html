@@ -47,6 +47,12 @@
       var $img = $("#img-field");
       var socket = io();
 
+      socket.on('snap', function(val) {
+        $output.append("\n");
+        $output.append("Snap is triggered!\nDATA: " val);
+        $img.attr("src","data:image/jpeg;charset=utf-8;base64," + val);
+      });
+
       $snapbtn.click(function(){
         $output.append("\n");
         $.getJSON("/api/snap", function(data) {

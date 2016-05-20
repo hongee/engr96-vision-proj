@@ -21,8 +21,10 @@ var gvision = gcloud.vision({
     keyFilename: './key.json'
 });
 
+//state trackers
 var isIdentifying = false;
 var isSnapping = false;
+var isNotRecentlyPressed = true;
 
 function uploadImageToGcloud(res) {
   fs.readFile("test002.jpg", function(err, data) {
@@ -76,9 +78,13 @@ function snap(res) {
     } else {
       fs.readFile("test002.jpg", function(err, data) {
           var imgb64 = data.toString('base64');
-          res.json({
-            img: imgb64
-          });
+          if(res) {
+            res.json({
+              img: imgb64
+            });
+          } else {
+            io.emit('snap', imgb64);
+          }
           isSnapping = false;
       });
     }
@@ -88,11 +94,6 @@ function snap(res) {
 
 io.on('connection', function(socket) {
   console.log("A user connected!");
-
-  socket.on('bg', function(val) {
-    console.log("Switching Bg");
-    io.emit('bg',val);
-  })
 
   socket.on('disconnect', function() {
     console.log("A user disconnected");
@@ -126,6 +127,12 @@ periodicActivity();
 function periodicActivity()
 {
   var val =  buttonPin.read(); //read the digital value of the pin
-  console.log('Gpio is ' + val); //write the read value out to the console
+  if(val && isNotRecentlyPressed) {
+    isNotRecentlyPressed = false;
+    snap(null);
+    setTimeout(function(){
+      isNotRecentlyPressed = true
+    }, 2000);
+  }
   setTimeout(periodicActivity, 100); //call the indicated function after 1 second (1000 milliseconds)
 }
