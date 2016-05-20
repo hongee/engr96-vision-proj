@@ -14,6 +14,9 @@ var gvision = gcloud.vision({
     keyFilename: './key.json'
 });
 
+var isIdentifying = true;
+var isSnapping = true;
+
 function uploadImageToGcloud(res) {
   fs.readFile("test003.jpg", function(err, data) {
       var imgb64 = data.toString('base64');
@@ -38,9 +41,11 @@ function uploadImageToGcloud(res) {
 
       gvision.annotate(annotateImageReq, function(err, annotations, apiResponse) {
         console.log("Done!\n");
-		console.log(err);
-		console.log(annotations);
-		res.json({annotate:annotations});
+    		console.log(err);
+    		console.log(annotations);
+
+    		res.json({annotate:annotations});
+        isIdentifying = false;
         /*
         _.forEach(annotations[0] ,function(val) {
           _.forEach(val, function(v) {
@@ -54,7 +59,7 @@ function uploadImageToGcloud(res) {
 
 function snap(res) {
   console.log("Snapping Pic...");
-  exec("/home/root/bin/ffmpeg/ffmpeg -s 1280x720 -f video4linux2 -i /dev/video0 -vframes 3 test%3d.jpg" , function(error, stdout, stderr) {
+  exec("/home/root/bin/ffmpeg/ffmpeg -s 1280x720 -f video4linux2 -i /dev/video0 -vframes 2 test%3d.jpg" , function(error, stdout, stderr) {
     //get file information for taken image
     var stats = fs.statSync("test003.jpg");
     console.log(stats["size"]);
@@ -67,6 +72,7 @@ function snap(res) {
           res.json({
             img: imgb64
           });
+          isSnapping = false;
       });
     }
 
@@ -78,11 +84,17 @@ app.get('/', function(req, res) {
 });
 
 app.get('/api/snap', function(req,res) {
-  snap(res);
+  if(!isSnapping) {
+    isSnapping = true;
+    snap(res);
+  }
 });
 
 app.get('/api/identify', function(req,res) {
-  uploadImageToGcloud(res);
+  if(!isSnapping) {
+    isIdentifying = true;
+    uploadImageToGcloud(res);
+  }
 });
 
 http.listen(3000, function() {
