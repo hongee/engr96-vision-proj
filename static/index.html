@@ -37,12 +37,16 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
     <script>
       var $snapbtn = $("#snapbtn");
       var $procbtn = $("#processbtn");
       var $clearbtn = $("#clearbtn");
       var $output = $("#output-dump");
       var $img = $("#img-field");
+      var socket = io();
+
       $snapbtn.click(function(){
         $output.append("\n");
         $.getJSON("/api/snap", function(data) {

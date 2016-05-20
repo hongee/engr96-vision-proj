@@ -1,11 +1,18 @@
 var gcloud = require('gcloud');
 var fs = require('fs');
 var _ = require('lodash');
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
 var fs = require('fs');
 var exec = require('child_process').exec;
+var mraa = require('mraa');
+
+var buttonPin = new mraa.Gpio(8);
+buttonPin.dir(m.DIR_IN);
 
 app.use(express.static('static'));
 
@@ -61,7 +68,7 @@ function snap(res) {
   console.log("Snapping Pic...");
   exec("/home/root/bin/ffmpeg/ffmpeg -s 1280x720 -f video4linux2 -i /dev/video0 -vframes 2 test%3d.jpg" , function(error, stdout, stderr) {
     //get file information for taken image
-    var stats = fs.statSync("test003.jpg");
+    var stats = fs.statSync("test002.jpg");
     console.log(stats["size"]);
     if(stats["size"] < 10000) {
       console.log("bad img");
@@ -78,6 +85,19 @@ function snap(res) {
 
   });
 }
+
+io.on('connection', function(socket) {
+  console.log("A user connected!");
+
+  socket.on('bg', function(val) {
+    console.log("Switching Bg");
+    io.emit('bg',val);
+  })
+
+  socket.on('disconnect', function() {
+    console.log("A user disconnected");
+  });
+});
 
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/app/index.html');
@@ -100,3 +120,12 @@ app.get('/api/identify', function(req,res) {
 http.listen(3000, function() {
   console.log("Server running on port 3000");
 });
+
+periodicActivity();
+
+function periodicActivity()
+{
+  var val =  myDigitalPin.read(); //read the digital value of the pin
+  console.log('Gpio is ' + myDigitalValue); //write the read value out to the console
+  setTimeout(periodicActivity, 100); //call the indicated function after 1 second (1000 milliseconds)
+}
