@@ -22,8 +22,12 @@
         <div class="col-md-6">
           <img id="img-field" src="http://www.placekitten.com/640/480"/>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
           <pre id="output-dump">----- OUTPUT ------
+          </pre>
+        </div>
+        <div class="col-md-3">
+          <pre id="output-dump">----- TEXT ------
           </pre>
         </div>
       </div>
@@ -37,12 +41,28 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
     <script>
       var $snapbtn = $("#snapbtn");
       var $procbtn = $("#processbtn");
       var $clearbtn = $("#clearbtn");
       var $output = $("#output-dump");
       var $img = $("#img-field");
+      var socket = io();
+
+      socket.on('snap', function(val) {
+        $output.append("\n");
+        $output.append("Snap is triggered!\nDATA: " + val);
+        $img.attr("src","data:image/jpeg;charset=utf-8;base64," + val);
+      });
+
+      socket.on('snap_res', function(val) {
+        $output.append("\n");
+        console.log(val);
+        $output.append(JSON.stringify(val));
+      });
+
       $snapbtn.click(function(){
         $output.append("\n");
         $.getJSON("/api/snap", function(data) {
@@ -62,6 +82,7 @@
       $clearbtn.click(function(){
         $output.html("");
       });
+
 
     </script>
   </body>
