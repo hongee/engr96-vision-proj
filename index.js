@@ -12,7 +12,7 @@ var exec = require('child_process').exec;
 var mraa = require('mraa');
 
 var buttonPin = new mraa.Gpio(8);
-buttonPin.dir(m.DIR_IN);
+buttonPin.dir(mraa.DIR_IN);
 
 app.use(express.static('static'));
 
@@ -125,7 +125,7 @@ periodicActivity();
 
 function periodicActivity()
 {
-  var val =  myDigitalPin.read(); //read the digital value of the pin
-  console.log('Gpio is ' + myDigitalValue); //write the read value out to the console
+  var val =  buttonPin.read(); //read the digital value of the pin
+  console.log('Gpio is ' + val); //write the read value out to the console
   setTimeout(periodicActivity, 100); //call the indicated function after 1 second (1000 milliseconds)
 }
