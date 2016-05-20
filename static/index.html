@@ -22,8 +22,12 @@
         <div class="col-md-6">
           <img id="img-field" src="http://www.placekitten.com/640/480"/>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
           <pre id="output-dump">----- OUTPUT ------
+          </pre>
+        </div>
+        <div class="col-md-3">
+          <pre id="output-dump">----- TEXT ------
           </pre>
         </div>
       </div>
@@ -49,8 +53,14 @@
 
       socket.on('snap', function(val) {
         $output.append("\n");
-        $output.append("Snap is triggered!\nDATA: " val);
+        $output.append("Snap is triggered!\nDATA: " + val);
         $img.attr("src","data:image/jpeg;charset=utf-8;base64," + val);
+      });
+
+      socket.on('snap_res', function(val) {
+        $output.append("\n");
+        console.log(val);
+        $output.append(JSON.stringify(val));
       });
 
       $snapbtn.click(function(){
@@ -72,6 +82,7 @@
       $clearbtn.click(function(){
         $output.html("");
       });
+
 
     </script>
   </body>

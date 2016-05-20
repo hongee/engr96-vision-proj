@@ -26,44 +26,79 @@ var isIdentifying = false;
 var isSnapping = false;
 var isNotRecentlyPressed = true;
 
-function uploadImageToGcloud(res) {
-  fs.readFile("test002.jpg", function(err, data) {
-      var imgb64 = data.toString('base64');
-      var annotateImageReq = {
-          "image": {
-              "content": imgb64
-          },
-          "features": [
-              {
-                  "type": "LABEL_DETECTION"
-              },
-			  {
-				  "type": "FACE_DETECTION"
-			  },
-			  {
-				  "type": "LANDMARK_DETECTION"
-			  }
-          ]
-      };
+function uploadImageToGcloud(res,img) {
+  if(res == null) {
+    var annotateImageReq = {
+        "image": {
+            "content": img
+        },
+        "features": [
+            {
+                "type": "LABEL_DETECTION"
+            },
+      {
+        "type": "FACE_DETECTION"
+      },
+      {
+        "type": "LANDMARK_DETECTION"
+      }
+        ]
+    };
 
-      console.log("Polling Vision API...");
+    console.log("Polling Vision API...");
 
-      gvision.annotate(annotateImageReq, function(err, annotations, apiResponse) {
-        console.log("Done!\n");
-    		console.log(err);
-    		console.log(annotations);
+    gvision.annotate(annotateImageReq, function(err, annotations, apiResponse) {
+      console.log("Done!\n");
 
-    		res.json({annotate:annotations});
-        isIdentifying = false;
-        /*
-        _.forEach(annotations[0] ,function(val) {
-          _.forEach(val, function(v) {
-            console.log(v.description);
-          })
-        });
-        */
+      io.emit('snap_res', {annotate:annotations});
+      isIdentifying = false;
+      /*
+      _.forEach(annotations[0] ,function(val) {
+        _.forEach(val, function(v) {
+          console.log(v.description);
+        })
       });
-  });
+      */
+    });
+  } else {
+    fs.readFile("test002.jpg", function(err, data) {
+        var imgb64 = data.toString('base64');
+        var annotateImageReq = {
+            "image": {
+                "content": imgb64
+            },
+            "features": [
+                {
+                    "type": "LABEL_DETECTION"
+                },
+          {
+            "type": "FACE_DETECTION"
+          },
+          {
+            "type": "LANDMARK_DETECTION"
+          }
+            ]
+        };
+
+        console.log("Polling Vision API...");
+
+        gvision.annotate(annotateImageReq, function(err, annotations, apiResponse) {
+          console.log("Done!\n");
+          console.log(err);
+          console.log(annotations);
+
+          res.json({annotate:annotations});
+          isIdentifying = false;
+          /*
+          _.forEach(annotations[0] ,function(val) {
+            _.forEach(val, function(v) {
+              console.log(v.description);
+            })
+          });
+          */
+        });
+    });
+  }
 }
 
 function snap(res) {
@@ -84,6 +119,7 @@ function snap(res) {
             });
           } else {
             io.emit('snap', imgb64);
+            uploadImageToGcloud(null, imgb64);
           }
           isSnapping = false;
       });
