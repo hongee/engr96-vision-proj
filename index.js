@@ -6,6 +6,7 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var ibm = require('watson-developer-cloud');
 
 var fs = require('fs');
 var exec = require('child_process').exec;
@@ -19,6 +20,12 @@ app.use(express.static('static'));
 var gvision = gcloud.vision({
     projectId: 'e96--1282',
     keyFilename: './key.json'
+});
+
+var textToSpeech = ibm.text_to_speech({
+  version: 'v1',
+  username: '696b478e-4276-45b9-bed2-3b7a6c0056f3',
+  password: 'P5H3iN8zg8Pj'
 });
 
 //state trackers
@@ -88,6 +95,7 @@ function uploadImageToGcloud(res,img) {
           console.log(annotations);
 
           res.json({annotate:annotations});
+
           isIdentifying = false;
           /*
           _.forEach(annotations[0] ,function(val) {
