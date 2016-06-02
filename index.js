@@ -113,7 +113,7 @@ function formTextforSynthesis(annObj) {
   wavFileStream.on('close', function() {
     var stats = fs.statSync("output.wav");
     console.log(stats["size"]);
-    exec("playSpeech output.wav", function(err,stdout,stderr) {
+    exec("./play engr96-vision-proj/output.wav", function(err,stdout,stderr) {
       if(err) {
         io.emit("status", "Failed to play sound :(");
       } else {
