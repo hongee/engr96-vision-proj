@@ -51,23 +51,34 @@
       var $img = $("#img-field");
       var socket = io();
 
+      socket.on('snap_trig', function(){
+        $output.append("\n");
+        $output.append("Snap is triggered!");
+      });
+
       socket.on('snap', function(val) {
         $output.append("\n");
-        $output.append("Snap is triggered!\nDATA: " + val);
+        $output.append("Received Image Data!\nDATA: " + val);
         $img.attr("src","data:image/jpeg;charset=utf-8;base64," + val);
+      });
+
+      socket.on('status', function(val) {
+        $output.append("\n" + val);
       });
 
       socket.on('snap_res', function(val) {
         $output.append("\n");
-        console.log(val);
+        $output.append("Received Annotations, synthesizing to sound...\n");
         $output.append(JSON.stringify(val));
+        console.log(val);
       });
 
       $snapbtn.click(function(){
         $output.append("\n");
         $.getJSON("/api/snap", function(data) {
-          $output.append(JSON.stringify(data));
+          $output.append("Captured image, now processing...\n");
           $img.attr("src","data:image/jpeg;charset=utf-8;base64," + data.img);
+          console.log(data);
         });
       });
 
@@ -75,6 +86,7 @@
         $output.append("\n");
         $.getJSON("/api/identify", function(data) {
           console.log(data);
+          $output.append("Received Annotations, synthesizing to sound...\n");
           $output.append(JSON.stringify(data));
         });
       });

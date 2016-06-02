@@ -32,6 +32,96 @@ var textToSpeech = ibm.text_to_speech({
 var isIdentifying = false;
 var isSnapping = false;
 var isNotRecentlyPressed = true;
+var isProcessing = false;
+
+function formTextforSynthesis(annObj) {
+  var outputString = "";
+
+  if(annObj.hasOwnProperty("faceAnnotations")) {
+    if(annObj.faceAnnotations.length == 1)
+      outputString += "There is one person in front of you. ";
+    else
+      outputString += "There are " + annObj.faceAnnotations.length + " people in front of you. ";
+
+    var numAnger = 0, numJoy = 0, numSurprise = 0, numSorrow = 0;
+    _.forEach(annObj.faceAnnotations, function(i) {
+      _.forEach(i, function(value, key) {
+        var isLikely = false;
+        switch (value) {
+          case "VERY_LIKELY":
+          case "LIKELY":
+          case "POSSIBLE":
+            isLikely = true;
+            break;
+        }
+
+        if(isLikely) {
+          switch (key) {
+            case "angerLikelihood":
+              numAnger++;
+              break;
+            case "joyLikelihood":
+              numJoy++;
+              break;
+            case "surpriseLikelihood":
+              numSurprise++;
+              break;
+            case "sorrowLikelihood":
+              numSorrow++;
+              break;
+          }
+        }
+      });
+
+    });
+
+    if(numAnger > 0)
+      outputString += numAnger + " of them is possibly angry. ";
+    if(numJoy > 0)
+      outputString += numJoy + " of them is possibly happy. "
+    if(numSorrow > 0)
+      outputString += numSorrow + " of them is possibly sad. "
+    if(numSurprise > 0)
+      outputString += numSurprise + " of them is possibly surprised. "
+
+  }
+
+  if(annObj.hasOwnProperty("labelAnnotations")) {
+    outputString += "Here are some possible descriptions of the scene. "
+    var count = 0;
+    _.forEach(annObj.labelAnnotations, function(value) {
+      if(value.score > 0.7) { //arbitrary
+        count++;
+        outputString += count + " : " + value.description + ". ";
+      }
+    })
+  }
+
+  console.log(outputString);
+
+  io.emit("status", "Converting text to speech:" + outputString);
+
+  var wavFileStream = fs.createWriteStream('output.wav');
+  var transcript = textToSpeech.synthesize({text:outputString, accept:"audio/wav"});
+
+  transcript.on('response', function() {
+    io.emit("status", "Done converting to sound, now writing to disk and playing...");
+  });
+
+  transcript.pipe(wavFileStream);
+
+  wavFileStream.on('close', function() {
+    var stats = fs.statSync("output.wav");
+    console.log(stats["size"]);
+    exec("playSpeech output.wav", function(err,stdout,stderr) {
+      if(err) {
+        io.emit("status", "Failed to play sound :(");
+      } else {
+        io.emit("status", "Played speech!");
+      }
+    });
+  });
+}
 
 function uploadImageToGcloud(res,img) {
   if(res == null) {
@@ -56,16 +146,9 @@ function uploadImageToGcloud(res,img) {
 
     gvision.annotate(annotateImageReq, function(err, annotations, apiResponse) {
       console.log("Done!\n");
-
       io.emit('snap_res', {annotate:annotations});
+      formTextforSynthesis(annotations[0]);
       isIdentifying = false;
-      /*
-      _.forEach(annotations[0] ,function(val) {
-        _.forEach(val, function(v) {
-          console.log(v.description);
-        })
-      });
-      */
     });
   } else {
     fs.readFile("test002.jpg", function(err, data) {
@@ -88,6 +171,7 @@ function uploadImageToGcloud(res,img) {
         };
 
         console.log("Polling Vision API...");
+        io.emit('status',"Polling Vision API...");
 
         gvision.annotate(annotateImageReq, function(err, annotations, apiResponse) {
           console.log("Done!\n");
@@ -95,15 +179,9 @@ function uploadImageToGcloud(res,img) {
           console.log(annotations);
 
           res.json({annotate:annotations});
-
+          formTextforSynthesis(annotations[0]);
           isIdentifying = false;
-          /*
-          _.forEach(annotations[0] ,function(val) {
-            _.forEach(val, function(v) {
-              console.log(v.description);
-            })
-          });
-          */
+
         });
     });
   }
@@ -170,13 +248,19 @@ periodicActivity();
 
 function periodicActivity()
 {
-  var val =  buttonPin.read(); //read the digital value of the pin
+  var val = buttonPin.read(); //read the digital value of the pin
   if(val && isNotRecentlyPressed) {
+    io.emit('snap_trig', "true");
     isNotRecentlyPressed = false;
-    snap(null);
+    if(!isProcessing) {
+      isProcessing = true;
+      snap(null);
+    } else {
+      io.emit("status", "The previous image is still being processed!");
+    }
     setTimeout(function(){
       isNotRecentlyPressed = true
     }, 2000);
   }
-  setTimeout(periodicActivity, 100); //call the indicated function after 1 second (1000 milliseconds)
+  setTimeout(periodicActivity, 100);
 }
