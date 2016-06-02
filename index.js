@@ -119,6 +119,7 @@ function formTextforSynthesis(annObj) {
       } else {
         io.emit("status", "Played speech!");
       }
+      isProcessing = false;
     });
   });
 }
@@ -181,6 +182,7 @@ function uploadImageToGcloud(res,img) {
           res.json({annotate:annotations});
           formTextforSynthesis(annotations[0]);
           isIdentifying = false;
+          isProcessing = false;
 
         });
     });
@@ -203,6 +205,7 @@ function snap(res) {
             res.json({
               img: imgb64
             });
+            isProcessing = false;
           } else {
             io.emit('snap', imgb64);
             uploadImageToGcloud(null, imgb64);
